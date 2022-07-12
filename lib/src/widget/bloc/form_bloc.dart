@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:rxdart/rxdart.dart';
+import 'package:simple_bloc_app_with_sqflite/src/models/user_model.dart';
+import 'package:simple_bloc_app_with_sqflite/src/resources/repository.dart';
 import 'package:simple_bloc_app_with_sqflite/src/widget/bloc/validators.dart';
 
 class FormBloc with Validator {
@@ -8,7 +10,6 @@ class FormBloc with Validator {
   // BehaviorSubject can do it so well :)/ it can holds the last emitted value
   //  final _email = StreamController<String>.broadcast();
   //  //  final _password = StreamController<String>.broadcast();
-
   final _email = BehaviorSubject<String>();
   final _password = BehaviorSubject<String>();
 
@@ -22,11 +23,11 @@ class FormBloc with Validator {
 
   Function(String) get changePassword => _password.sink.add;
 
-  submitPressed() {
+ Map<String, String> submitPressed()   {
     final validEmail = _email.value;
     final validPassword = _password.value;
 
-    //TODO save to SQFLITE
+    return   <String, String>{'email': validEmail, 'password': validPassword};
   }
 
   dispose() {

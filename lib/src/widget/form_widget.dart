@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:simple_bloc_app_with_sqflite/src/models/user_model.dart';
 import 'package:simple_bloc_app_with_sqflite/src/widget/bloc/login_form_provider.dart';
+import 'package:simple_bloc_app_with_sqflite/src/widget/bloc/users_bloc.dart';
+import 'package:simple_bloc_app_with_sqflite/src/widget/bloc/users_provider.dart';
 import '../widget/bloc/form_bloc.dart';
 
 class FormWidget extends StatelessWidget {
@@ -8,6 +11,8 @@ class FormWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formBloc = LoginFormProvider.of(context);
+    final usersBloc = UsersProvider.of(context);
+
     return Padding(
       padding: const EdgeInsets.all(40.0),
       child: Column(
@@ -20,7 +25,7 @@ class FormWidget extends StatelessWidget {
           const SizedBox(
             height: 20,
           ),
-          submit(formBloc),
+          submit(formBloc,usersBloc),
         ],
       ),
     );
@@ -62,7 +67,7 @@ class FormWidget extends StatelessWidget {
         });
   }
 
-  Widget submit(FormBloc formBloc) {
+  Widget submit(FormBloc formBloc, UsersBloc usersBloc) {
     return StreamBuilder(
         stream: formBloc.submit,
         builder: (context, snapshot) {
@@ -77,7 +82,12 @@ class FormWidget extends StatelessWidget {
             color: Colors.amber,
             onPressed: !snapshot.hasData
                 ? null
-                : formBloc.submitPressed,
+                : () {
+                    final Map<String, String> result = formBloc.submitPressed();
+                    print(result['email'].toString());
+                    usersBloc.addUser(
+                        UserModel(result['email'].toString(), result['password'].toString()));
+                  },
           );
         });
   }
