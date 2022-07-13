@@ -8,18 +8,23 @@ import 'dart:io';
 import 'dart:async';
 
 class UserDbProvider {
-
   UserDbProvider() {
     init();
   }
 
-  late Database db;
+  Database? db;
 
   init() async {
     print("INIT DONE");
+    if (db != null) {
+      return;
+    }
+
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    print('DIR= ' + documentsDirectory.toString());
     final String path = join(documentsDirectory.path, 'mydb.db');
-    db = await openDatabase(path, version: 1,
+    print(path);
+    db = await openDatabase(path, version: 2,
         onCreate: (Database newDB, int version) async {
       await newDB.execute("""
           CREATE TABLE user(
@@ -32,22 +37,30 @@ class UserDbProvider {
   }
 
   Future<List<UserModel>?> fetchItems() async {
-    final maps = await db.query(
+    if (db == null) await init();
+
+    final maps = await db!.query(
       "user",
       columns: null,
     );
     if (maps.length > 0) {
+      print('USRS IS NOT EMPTY');
       List<UserModel> list = [];
       maps.forEach((element) {
         list.add(UserModel.fromDB(element));
       });
+      print(list.length);
+      print(list);
       return list;
     } else {
+      print('USRS IS EMPTY');
       return null;
     }
   }
 
   addItem(UserModel item) {
-    db.insert('user', item.toMap());
+    if (db == null)
+      init();
+    db!.insert('user', item.toMap());
   }
 }

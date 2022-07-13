@@ -87,6 +87,7 @@ class FormWidget extends StatelessWidget {
                     print(result['email'].toString());
                     usersBloc.addUser(
                         UserModel(result['email'].toString(), result['password'].toString()));
+                    usersBloc.fetchUsers();
                   },
           );
         });
